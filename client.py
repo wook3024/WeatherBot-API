@@ -1,10 +1,10 @@
-import time
-import random
 import argparse
+import random
+import time
+
+from alive_progress import alive_bar
 from httpx import Client
 from rich.console import Console
-from alive_progress import alive_bar
-
 
 console = Console()
 timeout_count = 0
@@ -28,11 +28,11 @@ def elapsed_time(fn):
 def run():
     with Client() as client:
         response = client.get(
-            url="http://localhost:8000/summary", 
+            url="http://localhost:8000/summary",
             params={
-                "lat": random.randrange(min_value,max_value), 
-                "lon": random.randrange(min_value,max_value)
-            }
+                "lat": random.randrange(min_value, max_value),
+                "lon": random.randrange(min_value, max_value),
+            },
         )
     if response.status_code != 200:
         global timeout_count
@@ -49,4 +49,6 @@ if __name__ == "__main__":
         for _ in range(args.count):
             run()
             bar()
-    console.log("Count: {}, Timeout ratio: {}".format(args.count, timeout_count / args.count))
+    console.log(
+        "Count: {}, Timeout ratio: {}".format(args.count, timeout_count / args.count)
+    )
