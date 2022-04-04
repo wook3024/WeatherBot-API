@@ -1,11 +1,11 @@
 import time
-import uvicorn
 
+import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
 
-from .routes import index
-from . import logger, cfg
+from . import cfg, logger
+from .routes import index, weather
 
 
 def create_app() -> FastAPI:
@@ -26,6 +26,8 @@ def create_app() -> FastAPI:
         return response
 
     app.include_router(router=index.router, tags=["Index"])
+    app.include_router(router=weather.router, tags=["Weather"])
+
     return app
 
 
