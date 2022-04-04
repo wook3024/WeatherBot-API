@@ -27,4 +27,5 @@ class TestIndex:
         self, client: TestClient, lat: float, lon: float, status_code: int
     ) -> None:
         response = client.get("/summary", params={"lon": lon, "lat": lat})
+        print(response.text)
         assert response.status_code == status_code
