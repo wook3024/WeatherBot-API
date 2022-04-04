@@ -11,7 +11,8 @@ weather:
   current_endpoint: /current
   api_key: CMRJW4WT7V3QA5AOIGPBC
   weather_map:
-    - "맑음"
-    - "흐림"
-    - "비"
-    - "눈"
+    - "sun"
+    - "smoke"
+    - "rain"
+    - "snow"
+    - "others"
