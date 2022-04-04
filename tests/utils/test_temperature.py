@@ -2,10 +2,14 @@ from unittest.mock import patch
 
 import pytest
 
+from app import cfg
 from app.utils.weather import Temperature
 
 LAT = 14.3
 LOT = -175
+
+
+temperature_message = cfg.service.message.temperature
 
 
 # TODO: 15 이하일 때 양수, 음수 케이스 테스트
@@ -14,12 +18,12 @@ class TestTemperature:
     @pytest.mark.parametrize(
         "diff_temp_message,cur_temp,pre_temp",
         [
-            ("어제보다 n도 더 덥습니다.", 15, 0),
-            ("어제보다 n도 덜 춥습니다.", 15, 16),
-            ("어제와 비슷하게 덥습니다.", 15, 15),
-            ("어제보다 n도 덜 춥습니다.", -2, -3),
-            ("어제보다 n도 더 춥습니다.", -2, -1),
-            ("어제와 비슷하게 춥습니다.", -2, -2),
+            (temperature_message.hotter.format(15 - 0), 15, 0),
+            (temperature_message.less_hot.format(15 - 16), 15, 16),
+            (temperature_message.similarly_hot, 15, 15),
+            (temperature_message.less_cold.format(-2 + 3), -2, -3),
+            (temperature_message.colder.format(-2 + 1), -2, -1),
+            (temperature_message.similarly_cold, -2, -2),
         ],
     )
     @patch("app.utils.weather.Weather.get_weather_data")
@@ -34,8 +38,7 @@ class TestTemperature:
         temps = [cur_temp, -cur_temp, pre_temp, -pre_temp]
         mock_get_weather_data.return_value = temps
         return_value = await Temperature.get_temp_message(LAT, LOT, cur_temp, pre_temp)
-        print(temps)
-        min_max_temp_message = "최고기온은 {}도, 최저기온은 {}도 입니다.".format(
+        min_max_temp_message = temperature_message.min_max.format(
             min(temps), max(temps)
         )
         assert return_value == " ".join([diff_temp_message, min_max_temp_message])

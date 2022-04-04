@@ -13,7 +13,32 @@ weather:
   api_key: CMRJW4WT7V3QA5AOIGPBC
   weather_map:
     - "sun"
-    - "smoke"
+    - "foggy"
     - "rain"
     - "snow"
     - "others"
+
+message:
+  greeting:
+    snow: "눈이 포슬포슬 내립니다."
+    heavy_snow: "폭설이 내리고 있어요."
+    rain: "비가 오고 있습니다."
+    heavy_rain: "폭우가 내리고 있어요."
+    foggy: "날씨가 약간은 칙칙해요."
+    sunny: "따사로운 햇살을 맞으세요."
+    cold: "날이 참 춥네요."
+    clear: "날씨가 참 맑습니다."
+  temperature:
+    min_max: "최고기온은 {}도, 최저기온은 {}도 입니다."
+    hotter: "어제보다 {}도 더 덥습니다."
+    less_hot: "어제보다 {}도 덜 덥습니다."
+    similarly_hot: "어제와 비슷하게 덥습니다."
+    colder: "어제보다 {}도 더 춥습니다."
+    less_cold: "어제보다 {}도 덜 춥습니다."
+    similarly_cold: "어제와 비슷하게 춥습니다."
+  headsup:
+    heavy_snow: "내일 폭설이 내릴 수도 있으니 외출 시 주의하세요."
+    snow: "눈이 내릴 예정이니 외출 시 주의하세요."
+    heavy_rain: "폭우가 내릴 예정이에요. 우산을 미리 챙겨두세요."
+    rain: "며칠동안 비 소식이 있어요."
+    clear: "날씨는 대체로 평온할 예정이에요."

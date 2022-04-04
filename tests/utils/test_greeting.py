@@ -2,11 +2,10 @@ from typing import Optional
 
 import pytest
 
-from app import schemas
+from app import cfg, schemas
 from app.utils.weather import Greeting
 
-LAT = 14.3
-LOT = -175
+greeting_message = cfg.service.message.greeting
 
 
 # TODO: 극단적인 값 테스트
@@ -14,14 +13,14 @@ class TestGreeting:
     @pytest.mark.parametrize(
         "message,code,rain1h,temp",
         [
-            ("눈이 포슬포슬 내립니다.", 3, 99, -1),
-            ("폭설이 내리고 있어요.", 3, 100, -1),
-            ("비가 오고 있습니다.", 2, 99, -1),
-            ("폭우가 내리고 있어요.", 2, 100, -1),
-            ("날씨가 약간은 칙칙해요.", 1, -1, -1),
-            ("따사로운 햇살을 맞으세요.", 0, -1, 30),
-            ("날이 참 춥네요.", 4, -1, 0),
-            ("날씨가 참 맑습니다.", 4, -1, 1),
+            (greeting_message.snow, 3, 99, -1),
+            (greeting_message.heavy_snow, 3, 100, -1),
+            (greeting_message.rain, 2, 99, -1),
+            (greeting_message.heavy_rain, 2, 100, -1),
+            (greeting_message.foggy, 1, -1, -1),
+            (greeting_message.sunny, 0, -1, 30),
+            (greeting_message.cold, 4, -1, 0),
+            (greeting_message.clear, 4, -1, 1),
         ],
     )
     @pytest.mark.asyncio

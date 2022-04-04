@@ -59,22 +59,23 @@ class Greeting(object):
     async def get_greeting_message(cur_weather: schemas.CurrentWeatherResponse) -> str:
         message = ""
         weather = cfg.service.weather.weather_map[cur_weather.code]
+        greeting_message = cfg.service.message.greeting
         if weather == "snow":
-            message = "눈이 포슬포슬 내립니다."
+            message = greeting_message.snow
             if cur_weather.rain1h >= 100:
-                message = "폭설이 내리고 있어요."
+                message = greeting_message.heavy_snow
         elif weather == "rain":
-            message = "비가 오고 있습니다."
+            message = greeting_message.rain
             if cur_weather.rain1h >= 100:
-                message = "폭우가 내리고 있어요."
-        elif weather == "smoke":
-            message = "날씨가 약간은 칙칙해요."
+                message = greeting_message.heavy_rain
+        elif weather == "foggy":
+            message = greeting_message.foggy
         elif weather == "sun" and cur_weather.temp >= 30:
-            message = "따사로운 햇살을 맞으세요."
+            message = greeting_message.sunny
         elif cur_weather.temp <= 0:
-            message = "날이 참 춥네요."
+            message = greeting_message.cold
         else:
-            message = "날씨가 참 맑습니다."
+            message = greeting_message.clear
         return message
 
 
@@ -90,28 +91,28 @@ class Temperature(object):
             hour_offset=hour_offset,
             key="temp",
         )
-        message = "최고기온은 {}도, 최저기온은 {}도 입니다."
+        message = cfg.service.message.temperature.min_max
         return message.format(min(temps), max(temps))
 
     @staticmethod
     def get_diff_temp_message(cur_temp: float, pre_temp: float) -> str:
         message = ""
         diff_temp = cur_temp - pre_temp
+        temperature_message = cfg.service.message.temperature
         if cur_temp >= 15:
             if diff_temp > 0:
-                message = "어제보다 n도 더 덥습니다."
+                message = temperature_message.hotter.format(diff_temp)
             elif diff_temp < 0:
-                message = "어제보다 n도 덜 춥습니다."
+                message = temperature_message.less_hot.format(diff_temp)
             else:
-                message = "어제와 비슷하게 덥습니다."
+                message = temperature_message.similarly_hot.format(diff_temp)
         else:
             if diff_temp > 0:
-                message = "어제보다 n도 덜 춥습니다."
+                message = temperature_message.less_cold.format(diff_temp)
             elif diff_temp < 0:
-                message = "어제보다 n도 더 춥습니다."
+                message = temperature_message.colder.format(diff_temp)
             else:
-                message = "어제와 비슷하게 춥습니다."
-
+                message = temperature_message.similarly_cold.format(diff_temp)
         return message
 
     @classmethod
@@ -159,6 +160,7 @@ class HeadsUp(object):
     @classmethod
     async def get_headsup_message(cls, lat: float, lon: float) -> str:
         message = ""
+        headsup_message = cfg.service.message.headsup
         pre_weathers = await Weather.get_weather_data(
             lat=lat,
             lon=lon,
@@ -173,28 +175,28 @@ class HeadsUp(object):
             minimum_hour=12,
             cur_weather="snow",
         ):
-            message = "내일 폭설이 내릴 수도 있으니 외출 시 주의하세요."
+            message = headsup_message.heavy_snow
         elif cls.check_weather_condition(
             pre_weathers=pre_weathers,
             hour_offset=48,
             minimum_hour=12,
             cur_weather="snow",
         ):
-            message = "눈이 내릴 예정이니 외출 시 주의하세요."
+            message = headsup_message.snow
         elif cls.check_weather_condition(
             pre_weathers=pre_weathers,
             hour_offset=24,
             minimum_hour=12,
             cur_weather="rain",
         ):
-            message = "폭우가 내릴 예정이에요. 우산을 미리 챙겨두세요."
+            message = headsup_message.heavy_rain
         elif cls.check_weather_condition(
             pre_weathers=pre_weathers,
             hour_offset=48,
             minimum_hour=12,
             cur_weather="rain",
         ):
-            message = "며칠동안 비 소식이 있어요."
+            message = headsup_message.rain
         else:
-            message = "날씨는 대체로 평온할 예정이에요."
+            message = headsup_message.clear
         return message

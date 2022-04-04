@@ -2,10 +2,13 @@ from unittest.mock import patch
 
 import pytest
 
+from app import cfg
 from app.utils.weather import HeadsUp
 
 LAT = 14.3
 LON = -175
+
+headsup_message = cfg.service.message.headsup
 
 
 # TODO: 극단적인 값 케이스 테스트
@@ -14,24 +17,24 @@ class TestHeadsUp:
         "message,pre_weathers",
         [
             (
-                "내일 폭설이 내릴 수도 있으니 외출 시 주의하세요.",
+                headsup_message.heavy_snow,
                 ["snow", "rain", "sun", "snow"],
             ),
             (
-                "눈이 내릴 예정이니 외출 시 주의하세요.",
+                headsup_message.snow,
                 ["rain", "sun", "rain", "sun", "snow", "rain", "sun", "snow"],
             ),
             (
-                "폭우가 내릴 예정이에요. 우산을 미리 챙겨두세요.",
+                headsup_message.heavy_rain,
                 ["snow", "rain", "sun", "rain"],
             ),
             (
-                "며칠동안 비 소식이 있어요.",
-                ["sun", "rain", "sun", "sun", "smoke", "sun", "sun", "rain"],
+                headsup_message.rain,
+                ["sun", "rain", "sun", "sun", "foggy", "sun", "sun", "rain"],
             ),
             (
-                "날씨는 대체로 평온할 예정이에요.",
-                ["sun", "sun", "sun", "sun", "smoke", "sun", "sun", "rain"],
+                headsup_message.clear,
+                ["sun", "sun", "sun", "sun", "foggy", "sun", "sun", "rain"],
             ),
         ],
     )
