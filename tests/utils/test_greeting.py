@@ -2,37 +2,38 @@ from typing import Optional
 
 import pytest
 
-from app import schemas
-from app.utils.weather import get_greeting_wording
+from app import cfg, schemas
+from app.utils.weather import Greeting
 
-LAT = 14.3
-LOT = -175
+greeting_message = cfg.service.message.greeting
+base_rainfall = cfg.service.weather.base_rainfall
+base_warm_temp = cfg.service.weather.base_warm_temp
 
 
 # TODO: 극단적인 값 테스트
 class TestGreeting:
     @pytest.mark.parametrize(
-        "wording,code,rain1h,temp",
+        "message,code,rain1h,temp",
         [
-            ("눈이 포슬포슬 내립니다.", 3, 99, -1),
-            ("폭설이 내리고 있어요.", 3, 100, -1),
-            ("비가 오고 있습니다.", 2, 99, -1),
-            ("폭우가 내리고 있어요.", 2, 100, -1),
-            ("날씨가 약간은 칙칙해요.", 1, -1, -1),
-            ("따사로운 햇살을 맞으세요.", 0, -1, 30),
-            ("날이 참 춥네요.", 4, -1, 0),
-            ("날씨가 참 맑습니다.", 4, -1, 1),
+            (greeting_message.snow, 3, base_rainfall - 1, base_warm_temp - 1),
+            (greeting_message.heavy_snow, 3, base_rainfall, base_warm_temp - 1),
+            (greeting_message.rain, 2, base_rainfall - 1, base_warm_temp - 1),
+            (greeting_message.heavy_rain, 2, 100, base_warm_temp - 1),
+            (greeting_message.foggy, 1, base_rainfall - 1, base_warm_temp - 1),
+            (greeting_message.sunny, 0, base_rainfall - 1, base_warm_temp),
+            (greeting_message.cold, 4, base_rainfall - 1, 0),
+            (greeting_message.clear, 4, base_rainfall - 1, base_warm_temp - 1),
         ],
     )
     @pytest.mark.asyncio
-    async def test_get_greeting_wording(
+    async def test_get_greeting_message(
         self,
-        wording: str,
+        message: str,
         code: str,
         rain1h: int,
         temp: float,
     ) -> None:
-        return_value = await get_greeting_wording(
+        return_value = await Greeting.get_greeting_message(
             schemas.CurrentWeatherResponse(
                 timestamp=0000000000,
                 code=code,
@@ -48,4 +49,4 @@ class TestGreeting:
                 temp=temp,
             )
         )
-        assert wording == return_value
+        assert message == return_value
