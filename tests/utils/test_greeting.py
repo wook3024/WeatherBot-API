@@ -12,7 +12,7 @@ LOT = -175
 # TODO: 극단적인 값 테스트
 class TestGreeting:
     @pytest.mark.parametrize(
-        "wording,code,rain1h,temp",
+        "message,code,rain1h,temp",
         [
             ("눈이 포슬포슬 내립니다.", 3, 99, -1),
             ("폭설이 내리고 있어요.", 3, 100, -1),
@@ -25,14 +25,14 @@ class TestGreeting:
         ],
     )
     @pytest.mark.asyncio
-    async def test_get_greeting_wording(
+    async def test_get_greeting_message(
         self,
-        wording: str,
+        message: str,
         code: str,
         rain1h: int,
         temp: float,
     ) -> None:
-        return_value = await Greeting.get_greeting_wording(
+        return_value = await Greeting.get_greeting_message(
             schemas.CurrentWeatherResponse(
                 timestamp=0000000000,
                 code=code,
@@ -48,4 +48,4 @@ class TestGreeting:
                 temp=temp,
             )
         )
-        assert wording == return_value
+        assert message == return_value

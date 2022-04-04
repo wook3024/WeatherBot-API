@@ -12,7 +12,7 @@ LOT = -175
 # TODO: 극단적인 값 케이스 테스트
 class TestTemperature:
     @pytest.mark.parametrize(
-        "diff_temp_wording,cur_temp,pre_temp",
+        "diff_temp_message,cur_temp,pre_temp",
         [
             ("어제보다 n도 더 덥습니다.", 15, 0),
             ("어제보다 n도 덜 춥습니다.", 15, 16),
@@ -24,18 +24,18 @@ class TestTemperature:
     )
     @patch("app.utils.weather.Weather.get_weather_data")
     @pytest.mark.asyncio
-    async def test_get_temp_wording(
+    async def test_get_temp_message(
         self,
         mock_get_weather_data,
-        diff_temp_wording: str,
+        diff_temp_message: str,
         cur_temp: float,
         pre_temp: float,
     ) -> None:
         temps = [cur_temp, -cur_temp, pre_temp, -pre_temp]
         mock_get_weather_data.return_value = temps
-        return_value = await Temperature.get_temp_wording(LAT, LOT, cur_temp, pre_temp)
+        return_value = await Temperature.get_temp_message(LAT, LOT, cur_temp, pre_temp)
         print(temps)
-        min_max_temp_wording = "최고기온은 {}도, 최저기온은 {}도 입니다.".format(
+        min_max_temp_message = "최고기온은 {}도, 최저기온은 {}도 입니다.".format(
             min(temps), max(temps)
         )
-        assert return_value == " ".join([diff_temp_wording, min_max_temp_wording])
+        assert return_value == " ".join([diff_temp_message, min_max_temp_message])

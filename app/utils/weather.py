@@ -56,31 +56,31 @@ class Weather(object):
 
 class Greeting(object):
     @staticmethod
-    async def get_greeting_wording(cur_weather: schemas.CurrentWeatherResponse) -> str:
-        wording = ""
+    async def get_greeting_message(cur_weather: schemas.CurrentWeatherResponse) -> str:
+        message = ""
         weather = cfg.service.weather.weather_map[cur_weather.code]
         if weather == "snow":
-            wording = "눈이 포슬포슬 내립니다."
+            message = "눈이 포슬포슬 내립니다."
             if cur_weather.rain1h >= 100:
-                wording = "폭설이 내리고 있어요."
+                message = "폭설이 내리고 있어요."
         elif weather == "rain":
-            wording = "비가 오고 있습니다."
+            message = "비가 오고 있습니다."
             if cur_weather.rain1h >= 100:
-                wording = "폭우가 내리고 있어요."
+                message = "폭우가 내리고 있어요."
         elif weather == "smoke":
-            wording = "날씨가 약간은 칙칙해요."
+            message = "날씨가 약간은 칙칙해요."
         elif weather == "sun" and cur_weather.temp >= 30:
-            wording = "따사로운 햇살을 맞으세요."
+            message = "따사로운 햇살을 맞으세요."
         elif cur_weather.temp <= 0:
-            wording = "날이 참 춥네요."
+            message = "날이 참 춥네요."
         else:
-            wording = "날씨가 참 맑습니다."
-        return wording
+            message = "날씨가 참 맑습니다."
+        return message
 
 
 class Temperature(object):
     @staticmethod
-    async def get_min_max_temp_wording(lat: float, lon: float, hour_offset: int) -> str:
+    async def get_min_max_temp_message(lat: float, lon: float, hour_offset: int) -> str:
         hour_unit, unit_count = -6, 1
         temps = await Weather.get_weather_data(
             lat=lat,
@@ -90,32 +90,32 @@ class Temperature(object):
             hour_offset=hour_offset,
             key="temp",
         )
-        wording = "최고기온은 {}도, 최저기온은 {}도 입니다."
-        return wording.format(min(temps), max(temps))
+        message = "최고기온은 {}도, 최저기온은 {}도 입니다."
+        return message.format(min(temps), max(temps))
 
     @staticmethod
-    def get_diff_temp_wording(cur_temp: float, pre_temp: float) -> str:
-        wording = ""
+    def get_diff_temp_message(cur_temp: float, pre_temp: float) -> str:
+        message = ""
         diff_temp = cur_temp - pre_temp
         if cur_temp >= 15:
             if diff_temp > 0:
-                wording = "어제보다 n도 더 덥습니다."
+                message = "어제보다 n도 더 덥습니다."
             elif diff_temp < 0:
-                wording = "어제보다 n도 덜 춥습니다."
+                message = "어제보다 n도 덜 춥습니다."
             else:
-                wording = "어제와 비슷하게 덥습니다."
+                message = "어제와 비슷하게 덥습니다."
         else:
             if diff_temp > 0:
-                wording = "어제보다 n도 덜 춥습니다."
+                message = "어제보다 n도 덜 춥습니다."
             elif diff_temp < 0:
-                wording = "어제보다 n도 더 춥습니다."
+                message = "어제보다 n도 더 춥습니다."
             else:
-                wording = "어제와 비슷하게 춥습니다."
+                message = "어제와 비슷하게 춥습니다."
 
-        return wording
+        return message
 
     @classmethod
-    async def get_temp_wording(
+    async def get_temp_message(
         cls,
         lat: float,
         lon: float,
@@ -123,13 +123,13 @@ class Temperature(object):
         pre_temp: float,
         hour_offset: int = 24,
     ) -> str:
-        diff_temp_wording = cls.get_diff_temp_wording(
+        diff_temp_message = cls.get_diff_temp_message(
             cur_temp=cur_temp, pre_temp=pre_temp
         )
-        min_max_temp_wording = await cls.get_min_max_temp_wording(
+        min_max_temp_message = await cls.get_min_max_temp_message(
             lat=lat, lon=lon, hour_offset=hour_offset
         )
-        return " ".join([diff_temp_wording, min_max_temp_wording])
+        return " ".join([diff_temp_message, min_max_temp_message])
 
 
 class HeadsUp(object):
@@ -140,7 +140,7 @@ class HeadsUp(object):
         minimum_hour: int,
         cur_weather: str = "snow",
     ) -> bool:
-        """Condition check to determine the most appropriate wording
+        """Condition check to determine the most appropriate message
 
         Returns:
             bool: conditional check result
@@ -157,8 +157,8 @@ class HeadsUp(object):
         return False
 
     @classmethod
-    async def get_headsup_wording(cls, lat: float, lon: float) -> str:
-        wording = ""
+    async def get_headsup_message(cls, lat: float, lon: float) -> str:
+        message = ""
         pre_weathers = await Weather.get_weather_data(
             lat=lat,
             lon=lon,
@@ -173,28 +173,28 @@ class HeadsUp(object):
             minimum_hour=12,
             cur_weather="snow",
         ):
-            wording = "내일 폭설이 내릴 수도 있으니 외출 시 주의하세요."
+            message = "내일 폭설이 내릴 수도 있으니 외출 시 주의하세요."
         elif cls.check_weather_condition(
             pre_weathers=pre_weathers,
             hour_offset=48,
             minimum_hour=12,
             cur_weather="snow",
         ):
-            wording = "눈이 내릴 예정이니 외출 시 주의하세요."
+            message = "눈이 내릴 예정이니 외출 시 주의하세요."
         elif cls.check_weather_condition(
             pre_weathers=pre_weathers,
             hour_offset=24,
             minimum_hour=12,
             cur_weather="rain",
         ):
-            wording = "폭우가 내릴 예정이에요. 우산을 미리 챙겨두세요."
+            message = "폭우가 내릴 예정이에요. 우산을 미리 챙겨두세요."
         elif cls.check_weather_condition(
             pre_weathers=pre_weathers,
             hour_offset=48,
             minimum_hour=12,
             cur_weather="rain",
         ):
-            wording = "며칠동안 비 소식이 있어요."
+            message = "며칠동안 비 소식이 있어요."
         else:
-            wording = "날씨는 대체로 평온할 예정이에요."
-        return wording
+            message = "날씨는 대체로 평온할 예정이에요."
+        return message

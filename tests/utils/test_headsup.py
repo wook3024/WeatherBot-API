@@ -11,7 +11,7 @@ LON = -175
 # TODO: 극단적인 값 케이스 테스트
 class TestHeadsUp:
     @pytest.mark.parametrize(
-        "wording,pre_weathers",
+        "message,pre_weathers",
         [
             (
                 "내일 폭설이 내릴 수도 있으니 외출 시 주의하세요.",
@@ -38,8 +38,8 @@ class TestHeadsUp:
     @patch("app.utils.weather.Weather.get_weather_data")
     @pytest.mark.asyncio
     async def test_get_headsup(
-        self, mock_get_weather_data, wording, pre_weathers
+        self, mock_get_weather_data, message, pre_weathers
     ) -> None:
         mock_get_weather_data.return_value = pre_weathers
-        return_value = await HeadsUp.get_headsup_wording(lat=LAT, lon=LON)
-        assert return_value == wording
+        return_value = await HeadsUp.get_headsup_message(lat=LAT, lon=LON)
+        assert return_value == message
