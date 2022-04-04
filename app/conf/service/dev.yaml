@@ -4,3 +4,14 @@ app:
   host: 127.0.0.1
   port: 8000
   reload: True
+
+weather:
+  base_url: https://thirdparty-weather-api-v2.droom.workers.dev
+  historical_endpoint: /historical/hourly
+  current_endpoint: /current
+  api_key: CMRJW4WT7V3QA5AOIGPBC
+  weather_map:
+    - "맑음"
+    - "흐림"
+    - "비"
+    - "눈"

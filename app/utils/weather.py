@@ -1,18 +1,13 @@
-from typing import Tuple
+from urllib.parse import urljoin
 
 import httpx
 
-from .. import schemas
-
-base_url = "https://thirdparty-weather-api-v2.droom.workers.dev"
-historical_endpoint = "/historical/hourly"
-weather_map = ["맑음", "흐림", "비", "눈"]
-api_key = "CMRJW4WT7V3QA5AOIGPBC"
+from .. import cfg, schemas
 
 
 def get_greeting_wording(cur_weather: schemas.CurrentWeatherResponse) -> str:
     wording = ""
-    weather = weather_map[cur_weather.code]
+    weather = cfg.service.weather.weather_map[cur_weather.code]
     if weather == "snow":
         wording = "눈이 포슬포슬 내립니다."
         if cur_weather.rain1h >= 100:
@@ -43,9 +38,12 @@ def get_weather_data(
     results = []
     while abs(hour_unit * unit_count) <= abs(hour_offset):
         response = httpx.get(
-            url="{}/{}".format(base_url, historical_endpoint),
+            url=urljoin(
+                base=cfg.service.weather.base_url,
+                url=cfg.service.weather.historical_endpoint,
+            ),
             params={
-                "api_key": api_key,
+                "api_key": cfg.service.weather.api_key,
                 "lat": lat,
                 "lon": lon,
                 "hour_offset": hour_unit * unit_count,
@@ -57,7 +55,7 @@ def get_weather_data(
             data = previous_weather.get("temp")
         elif key == "weather":
             code = previous_weather.get("code")
-            data = weather_map[code]
+            data = cfg.service.weather.weather_map[code]
         results.append(data)
         unit_count += 1
     return results
@@ -65,7 +63,14 @@ def get_weather_data(
 
 def get_min_max_temp_wording(lat: float, lon: float, hour_offset: int) -> str:
     hour_unit, unit_count = -6, 1
-    temps = get_weather_data(lat, lon, unit_count, hour_unit, hour_offset, "temp")
+    temps = get_weather_data(
+        lat=lat,
+        lon=lon,
+        unit_count=unit_count,
+        hour_unit=hour_unit,
+        hour_offset=hour_offset,
+        key="temp",
+    )
     wording = "최고기온은 {}도, 최저기온은 {}도 입니다."
     return wording.format(min(temps), max(temps))
 
@@ -98,8 +103,10 @@ def get_temp_wording(
     pre_temp: float,
     hour_offset: int = 24,
 ) -> str:
-    diff_temp_wording = get_diff_temp_wording(cur_temp, pre_temp)
-    min_max_temp_wording = get_min_max_temp_wording(lat, lon, hour_offset)
+    diff_temp_wording = get_diff_temp_wording(cur_temp=cur_temp, pre_temp=pre_temp)
+    min_max_temp_wording = get_min_max_temp_wording(
+        lat=lat, lon=lon, hour_offset=hour_offset
+    )
     return " ".join([diff_temp_wording, min_max_temp_wording])
 
 
@@ -117,7 +124,12 @@ def check_weather_condition(
     """
     hour_unit, unit_count = -6, 1
     pre_weathers = get_weather_data(
-        lat, lon, unit_count, hour_unit, hour_offset, "weather"
+        lat=lat,
+        lon=lon,
+        unit_count=unit_count,
+        hour_unit=hour_unit,
+        hour_offset=hour_offset,
+        key="weather",
     )
     match_count = sum(
         [previous_weather == cur_weather for previous_weather in pre_weathers]
@@ -130,19 +142,35 @@ def check_weather_condition(
 def get_headsup_wording(lat: float, lon: float) -> str:
     wording = ""
     if check_weather_condition(
-        lat=lat, lon=lon, hour_offset=24, minimum_hour=12, cur_weather="snow"
+        lat=lat,
+        lon=lon,
+        hour_offset=24,
+        minimum_hour=12,
+        cur_weather="snow",
     ):
         wording = "내일 폭설이 내릴 수도 있으니 외출 시 주의하세요."
     elif check_weather_condition(
-        lat=lat, lon=lon, hour_offset=48, minimum_hour=12, cur_weather="snow”"
+        lat=lat,
+        lon=lon,
+        hour_offset=48,
+        minimum_hour=12,
+        cur_weather="snow",
     ):
         wording = "눈이 내릴 예정이니 외출 시 주의하세요."
     elif check_weather_condition(
-        lat=lat, lon=lon, hour_offset=24, minimum_hour=12, cur_weather="rain"
+        lat=lat,
+        lon=lon,
+        hour_offset=24,
+        minimum_hour=12,
+        cur_weather="rain",
     ):
         wording = "폭우가 내릴 예정이에요. 우산을 미리 챙겨두세요."
     elif check_weather_condition(
-        lat=lat, lon=lon, hour_offset=48, minimum_hour=12, cur_weather="rain"
+        lat=lat,
+        lon=lon,
+        hour_offset=48,
+        minimum_hour=12,
+        cur_weather="rain",
     ):
         wording = "며칠동안 비 소식이 있어요."
     else:
