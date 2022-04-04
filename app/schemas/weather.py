@@ -46,4 +46,5 @@ class HistoricalWeatherRequest(Coordinate):
 class HistoricalWeatherResponse(BaseModel):
     timestamp: float
     code: int
+    temp: float
     rain1h: int
