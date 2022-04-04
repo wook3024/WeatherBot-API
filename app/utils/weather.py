@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 from httpx import AsyncClient
 
-from .. import cfg, schemas
+from .. import cfg, schemas, logger
 
 
 class Weather(object):
@@ -85,6 +85,7 @@ class Greeting(object):
             message = greeting_message.cold
         else:
             message = greeting_message.so_clear
+        logger.info("Greeting message: {}".format(message))
         return message
 
 
@@ -140,7 +141,9 @@ class Temperature(object):
         min_max_temp_message = await cls.get_min_max_temp_message(
             lat=lat, lon=lon, hour_offset=hour_offset
         )
-        return " ".join([diff_temp_message, min_max_temp_message])
+        message = " ".join([diff_temp_message, min_max_temp_message])
+        logger.info("Temperature message: {}".format(message))
+        return message
 
 
 class HeadsUp(object):
@@ -165,6 +168,11 @@ class HeadsUp(object):
                 ]
             ]
         )
+        logger.debug(
+            "Heads up \nweather: {}, match hour: {}, minimum hour: {}".format(
+                cur_weather, abs(match_count * historical_time_unit), minimum_hour
+            )
+        )
         if abs(match_count * historical_time_unit) >= minimum_hour:
             return True
         return False
@@ -182,6 +190,7 @@ class HeadsUp(object):
             hour_offset=48,
             key="weather",
         )
+        logger.debug("Previous 48h weathers: \n{}".format(pre_weathers))
 
         if cls.check_weather_condition(
             pre_weathers=pre_weathers,
@@ -213,4 +222,5 @@ class HeadsUp(object):
             message = headsup_message.rain
         else:
             message = headsup_message.so_clear
+        logger.info("Hedas up message: {}".format(message))
         return message
