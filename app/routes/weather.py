@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import ORJSONResponse
 from httpx import AsyncClient
 
 from .. import cfg, schemas
@@ -39,7 +39,7 @@ async def request_weather_data(
 
 
 @router.get("/summary", response_model=schemas.SummaryResponse)
-async def summary(lon: float, lat: float) -> JSONResponse:
+async def summary(lon: float, lat: float) -> ORJSONResponse:
     async with AsyncClient() as client:
         cur_weather, pre_weather = await asyncio.gather(
             request_weather_data(
@@ -67,7 +67,7 @@ async def summary(lon: float, lat: float) -> JSONResponse:
         ),
         get_headsup_wording(lat, lon),
     )
-    return JSONResponse(
+    return ORJSONResponse(
         content=jsonable_encoder(
             {
                 "summary": {

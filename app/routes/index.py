@@ -1,6 +1,7 @@
-from fastapi import APIRouter
-from fastapi.responses import RedirectResponse, PlainTextResponse
+import asyncio
 
+from fastapi import APIRouter
+from fastapi.responses import PlainTextResponse, RedirectResponse
 
 router = APIRouter()
 
@@ -24,3 +25,8 @@ async def livez() -> PlainTextResponse:
         sPlainTextResponse: Health check response
     """
     return PlainTextResponse("\n", status_code=200)
+
+
+@router.get("/timeout", include_in_schema=False)
+async def route_for_test(sleep_time: float) -> None:
+    await asyncio.sleep(sleep_time)

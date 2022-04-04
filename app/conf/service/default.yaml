@@ -4,6 +4,7 @@ app:
   host: 127.0.0.1
   port: 8000
   reload: True
+  timeout: 1.5
 
 weather:
   base_url: https://thirdparty-weather-api-v2.droom.workers.dev
