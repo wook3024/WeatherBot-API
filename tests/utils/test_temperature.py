@@ -20,16 +20,36 @@ class TestTemperature:
     @pytest.mark.parametrize(
         "diff_temp_message,cur_temp,pre_temp",
         [
-            (temperature_message.hotter.format(5), base_hot_temp, base_hot_temp - 5),
-            (temperature_message.less_hot.format(-1), base_hot_temp, base_hot_temp + 1),
-            (temperature_message.similarly_hot, base_hot_temp, base_hot_temp),
+            (
+                temperature_message.hotter.format(5),
+                base_hot_temp,
+                base_hot_temp - 5,
+            ),
+            (
+                temperature_message.less_hot.format(1),
+                base_hot_temp,
+                base_hot_temp + 1,
+            ),
+            (
+                temperature_message.similarly_hot,
+                base_hot_temp,
+                base_hot_temp,
+            ),
             (
                 temperature_message.less_cold.format(1),
                 base_cold_temp,
                 base_cold_temp - 1,
             ),
-            (temperature_message.colder.format(-1), base_cold_temp, base_cold_temp + 1),
-            (temperature_message.similarly_cold, base_cold_temp, base_cold_temp),
+            (
+                temperature_message.colder.format(1),
+                base_cold_temp,
+                base_cold_temp + 1,
+            ),
+            (
+                temperature_message.similarly_cold,
+                base_cold_temp,
+                base_cold_temp,
+            ),
         ],
     )
     @patch("app.utils.weather.Weather.get_weather_data")
@@ -45,6 +65,6 @@ class TestTemperature:
         mock_get_weather_data.return_value = temps
         return_value = await Temperature.get_temp_message(LAT, LOT, cur_temp, pre_temp)
         min_max_temp_message = temperature_message.min_max.format(
-            min(temps), max(temps)
+            max(temps), min(temps)
         )
         assert return_value == " ".join([diff_temp_message, min_max_temp_message])
