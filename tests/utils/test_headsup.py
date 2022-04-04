@@ -29,6 +29,10 @@ class TestHeadsUp:
                 "며칠동안 비 소식이 있어요.",
                 ["sun", "rain", "sun", "sun", "smoke", "sun", "sun", "rain"],
             ),
+            (
+                "날씨는 대체로 평온할 예정이에요.",
+                ["sun", "sun", "sun", "sun", "smoke", "sun", "sun", "rain"],
+            ),
         ],
     )
     @patch("app.utils.weather.Weather.get_weather_data")
