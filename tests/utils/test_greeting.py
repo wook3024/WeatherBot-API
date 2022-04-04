@@ -24,14 +24,15 @@ class TestGreeting:
             ("날씨가 참 맑습니다.", 4, -1, 1),
         ],
     )
-    def test_get_greeting_wording(
+    @pytest.mark.asyncio
+    async def test_get_greeting_wording(
         self,
         wording: str,
         code: str,
         rain1h: int,
         temp: float,
     ) -> None:
-        return_value = get_greeting_wording(
+        return_value = await get_greeting_wording(
             schemas.CurrentWeatherResponse(
                 timestamp=0000000000,
                 code=code,

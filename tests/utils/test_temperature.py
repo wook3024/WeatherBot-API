@@ -23,7 +23,8 @@ class TestTemperature:
         ],
     )
     @patch("app.utils.weather.get_weather_data")
-    def test_get_temp_wording(
+    @pytest.mark.asyncio
+    async def test_get_temp_wording(
         self,
         mock_get_weather_data,
         diff_temp_wording: str,
@@ -32,7 +33,7 @@ class TestTemperature:
     ) -> None:
         temps = [cur_temp, -cur_temp, pre_temp, -pre_temp]
         mock_get_weather_data.return_value = temps
-        return_value = get_temp_wording(LAT, LOT, cur_temp, pre_temp)
+        return_value = await get_temp_wording(LAT, LOT, cur_temp, pre_temp)
         print(temps)
         min_max_temp_wording = "최고기온은 {}도, 최저기온은 {}도 입니다.".format(
             min(temps), max(temps)
