@@ -32,7 +32,10 @@ class TestHeadsUp:
         ],
     )
     @patch("app.utils.weather.get_weather_data")
-    def test_get_headsup(self, mock_get_weather_data, wording, pre_weathers) -> None:
+    @pytest.mark.asyncio
+    async def test_get_headsup(
+        self, mock_get_weather_data, wording, pre_weathers
+    ) -> None:
         mock_get_weather_data.return_value = pre_weathers
-        return_value = get_headsup_wording(lat=LAT, lon=LON)
+        return_value = await get_headsup_wording(lat=LAT, lon=LON)
         assert return_value == wording
