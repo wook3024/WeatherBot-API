@@ -1,11 +1,15 @@
+import asyncio
 import time
+
 import uvicorn
-
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_408_REQUEST_TIMEOUT
 
-from .routes import index
-from . import logger, cfg
+from . import cfg, logger
+from .routes import index, weather
 
 
 def create_app() -> FastAPI:
@@ -15,21 +19,42 @@ def create_app() -> FastAPI:
         default_response_class=ORJSONResponse,
     )
 
-    @app.middleware("http")
-    async def add_process_time_header(request: Request, call_next):
-        start_time = time.time()
-        response = await call_next(request)
-        process_time = time.time() - start_time
-        logger.info(
-            "{0} process time: {1:.8f}s".format(call_next.__name__, process_time)
-        )
-        return response
-
     app.include_router(router=index.router, tags=["Index"])
+    app.include_router(router=weather.router, tags=["Weather"])
+
     return app
 
 
 app = create_app()
+
+
+@app.middleware("http")
+async def timeout_middleware(request: Request, call_next):
+    try:
+        start_time = time.time()
+        return await asyncio.wait_for(
+            call_next(request), timeout=cfg.service.app.timeout
+        )
+    except asyncio.TimeoutError:
+        return ORJSONResponse(
+            status_code=HTTP_408_REQUEST_TIMEOUT,
+            content=jsonable_encoder(
+                {"detail": "Request processing time excedeed limit"}
+            ),
+        )
+    finally:
+        process_time = time.time() - start_time
+        logger.info(
+            "{0} process time: {1:.8f}s".format(call_next.__name__, process_time)
+        )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return ORJSONResponse(
+        status_code=HTTP_400_BAD_REQUEST,
+        content=jsonable_encoder({"detail": exc.errors()}),
+    )
 
 
 if __name__ == "__main__":

@@ -64,6 +64,8 @@ iniconfig==1.1.1
     # via pytest
 omegaconf==2.1.1
     # via hydra-core
+orjson==3.6.7
+    # via -r requirements/dev.in
 packaging==21.3
     # via pytest
 pluggy==1.0.0
@@ -79,7 +81,10 @@ pyparsing==3.0.7
 pytest==7.1.1
     # via
     #   -r requirements/dev.in
+    #   pytest-asyncio
     #   pytest-cov
+pytest-asyncio==0.18.3
+    # via -r requirements/dev.in
 pytest-cov==3.0.0
     # via -r requirements/dev.in
 python-dotenv==0.20.0

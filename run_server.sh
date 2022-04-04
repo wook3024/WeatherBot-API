@@ -1,1 +1,1 @@
-uvicorn app.main:app --host 0.0.0.0 --reload --reload-exclude logs/
+uvicorn app.main:app --host 0.0.0.0
