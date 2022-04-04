@@ -77,7 +77,7 @@ class Greeting(object):
         elif cur_weather.temp <= 0:
             message = greeting_message.cold
         else:
-            message = greeting_message.clear
+            message = greeting_message.so_clear
         return message
 
 
@@ -94,8 +94,8 @@ class Temperature(object):
             hour_offset=hour_offset,
             key="temp",
         )
-        message = cfg.service.message.temperature.min_max
-        return message.format(min(temps), max(temps))
+        message = cfg.service.message.temperature.min_max.format(max(temps), min(temps))
+        return message
 
     @staticmethod
     def get_diff_temp_message(cur_temp: float, pre_temp: float) -> str:
@@ -104,19 +104,19 @@ class Temperature(object):
         temperature_message = cfg.service.message.temperature
         if cur_temp >= cfg.service.weather.base_hot_temp:
             if diff_temp > 0:
-                message = temperature_message.hotter.format(diff_temp)
+                message = temperature_message.hotter
             elif diff_temp < 0:
-                message = temperature_message.less_hot.format(diff_temp)
+                message = temperature_message.less_hot
             else:
-                message = temperature_message.similarly_hot.format(diff_temp)
+                message = temperature_message.similarly_hot
         else:
             if diff_temp > 0:
-                message = temperature_message.less_cold.format(diff_temp)
+                message = temperature_message.less_cold
             elif diff_temp < 0:
-                message = temperature_message.colder.format(diff_temp)
+                message = temperature_message.colder
             else:
-                message = temperature_message.similarly_cold.format(diff_temp)
-        return message
+                message = temperature_message.similarly_cold
+        return message.format(abs(diff_temp))
 
     @classmethod
     async def get_temp_message(
@@ -205,5 +205,5 @@ class HeadsUp(object):
         ):
             message = headsup_message.rain
         else:
-            message = headsup_message.clear
+            message = headsup_message.so_clear
         return message
