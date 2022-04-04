@@ -132,9 +132,12 @@ def check_weather_condition(
         key="weather",
     )
     match_count = sum(
-        [previous_weather == cur_weather for previous_weather in pre_weathers]
+        [
+            previous_weather == cur_weather
+            for previous_weather in pre_weathers[: abs(hour_offset // hour_unit)]
+        ]
     )
-    if match_count * hour_unit >= minimum_hour:
+    if abs(match_count * hour_unit) >= minimum_hour:
         return True
     return False
 

@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from ...app.utils.weather import get_temp_wording
+from app.utils.weather import get_temp_wording
 
 LAT = 14.3
 LOT = -175
@@ -22,7 +22,7 @@ class TestTemperature:
             ("어제와 비슷하게 춥습니다.", -2, -2),
         ],
     )
-    @patch("weather.get_weather_data")
+    @patch("app.utils.weather.get_weather_data")
     def test_get_temp_wording(
         self,
         mock_get_weather_data,
@@ -31,9 +31,10 @@ class TestTemperature:
         pre_temp: float,
     ) -> None:
         temps = [cur_temp, -cur_temp, pre_temp, -pre_temp]
+        mock_get_weather_data.return_value = temps
+        return_value = get_temp_wording(LAT, LOT, cur_temp, pre_temp)
+        print(temps)
         min_max_temp_wording = "최고기온은 {}도, 최저기온은 {}도 입니다.".format(
             min(temps), max(temps)
         )
-        mock_get_weather_data.retuen_value = temps
-        return_value = get_temp_wording(LAT, LOT, cur_temp, pre_temp)
         assert return_value == " ".join([diff_temp_wording, min_max_temp_wording])
