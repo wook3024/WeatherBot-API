@@ -1,0 +1,15 @@
+level: DEBUG
+disable_existing_loggers: False
+propagate: False
+
+rotating:
+  level: DEBUG
+  max_megabytes: 100
+  backup_count: 100
+  path: /tmp/logs
+  filename: logs.log
+
+rich:
+  omit_repeated_times: False
+  rich_tracebacks: True
+  show_path: True

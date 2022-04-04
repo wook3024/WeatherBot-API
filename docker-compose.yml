@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    image: suy3024/fastapi-template:${WEATHER_IMAGE_VERSION:-0.1.0}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.8}
+    container_name: web
+    ports:
+      - 8000:8000
+    volumes:
+      - ${BASE_VOLUME_DIR:-./logs}/web:/tmp/logs:rw
+    environment:
+      - COLUMNS=${COLUMNS:-200}
