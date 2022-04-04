@@ -17,6 +17,11 @@ weather:
     - "rain"
     - "snow"
     - "others"
+  base_hot_temp: 15
+  base_cold_temp: -2
+  base_rainfall: 100
+  base_warm_temp: 30
+  historical_time_unit: -6
 
 message:
   greeting:

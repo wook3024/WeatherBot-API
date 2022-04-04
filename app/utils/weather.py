@@ -59,18 +59,20 @@ class Greeting(object):
     async def get_greeting_message(cur_weather: schemas.CurrentWeatherResponse) -> str:
         message = ""
         weather = cfg.service.weather.weather_map[cur_weather.code]
+        base_rainfall = cfg.service.weather.base_rainfall
+        base_warm_temp = cfg.service.weather.base_warm_temp
         greeting_message = cfg.service.message.greeting
         if weather == "snow":
             message = greeting_message.snow
-            if cur_weather.rain1h >= 100:
+            if cur_weather.rain1h >= base_rainfall:
                 message = greeting_message.heavy_snow
         elif weather == "rain":
             message = greeting_message.rain
-            if cur_weather.rain1h >= 100:
+            if cur_weather.rain1h >= base_rainfall:
                 message = greeting_message.heavy_rain
         elif weather == "foggy":
             message = greeting_message.foggy
-        elif weather == "sun" and cur_weather.temp >= 30:
+        elif weather == "sun" and cur_weather.temp >= base_warm_temp:
             message = greeting_message.sunny
         elif cur_weather.temp <= 0:
             message = greeting_message.cold
@@ -82,12 +84,13 @@ class Greeting(object):
 class Temperature(object):
     @staticmethod
     async def get_min_max_temp_message(lat: float, lon: float, hour_offset: int) -> str:
-        hour_unit, unit_count = -6, 1
+        historical_time_unit = cfg.service.weather.historical_time_unit
+        unit_count = 1
         temps = await Weather.get_weather_data(
             lat=lat,
             lon=lon,
             unit_count=unit_count,
-            hour_unit=hour_unit,
+            hour_unit=historical_time_unit,
             hour_offset=hour_offset,
             key="temp",
         )
@@ -99,7 +102,7 @@ class Temperature(object):
         message = ""
         diff_temp = cur_temp - pre_temp
         temperature_message = cfg.service.message.temperature
-        if cur_temp >= 15:
+        if cur_temp >= cfg.service.weather.base_hot_temp:
             if diff_temp > 0:
                 message = temperature_message.hotter.format(diff_temp)
             elif diff_temp < 0:
@@ -146,14 +149,16 @@ class HeadsUp(object):
         Returns:
             bool: conditional check result
         """
-        hour_unit, unit_count = -6, 1
+        historical_time_unit = cfg.service.weather.historical_time_unit
         match_count = sum(
             [
                 previous_weather == cur_weather
-                for previous_weather in pre_weathers[: abs(hour_offset // hour_unit)]
+                for previous_weather in pre_weathers[
+                    : abs(hour_offset // historical_time_unit)
+                ]
             ]
         )
-        if abs(match_count * hour_unit) >= minimum_hour:
+        if abs(match_count * historical_time_unit) >= minimum_hour:
             return True
         return False
 
@@ -161,14 +166,16 @@ class HeadsUp(object):
     async def get_headsup_message(cls, lat: float, lon: float) -> str:
         message = ""
         headsup_message = cfg.service.message.headsup
+        historical_time_unit = cfg.service.weather.historical_time_unit
         pre_weathers = await Weather.get_weather_data(
             lat=lat,
             lon=lon,
             unit_count=1,
-            hour_unit=-6,
+            hour_unit=historical_time_unit,
             hour_offset=48,
             key="weather",
         )
+
         if cls.check_weather_condition(
             pre_weathers=pre_weathers,
             hour_offset=24,

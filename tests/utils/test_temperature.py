@@ -10,6 +10,8 @@ LOT = -175
 
 
 temperature_message = cfg.service.message.temperature
+base_hot_temp = cfg.service.weather.base_hot_temp
+base_cold_temp = cfg.service.weather.base_cold_temp
 
 
 # TODO: 15 이하일 때 양수, 음수 케이스 테스트
@@ -18,12 +20,16 @@ class TestTemperature:
     @pytest.mark.parametrize(
         "diff_temp_message,cur_temp,pre_temp",
         [
-            (temperature_message.hotter.format(15 - 0), 15, 0),
-            (temperature_message.less_hot.format(15 - 16), 15, 16),
-            (temperature_message.similarly_hot, 15, 15),
-            (temperature_message.less_cold.format(-2 + 3), -2, -3),
-            (temperature_message.colder.format(-2 + 1), -2, -1),
-            (temperature_message.similarly_cold, -2, -2),
+            (temperature_message.hotter.format(5), base_hot_temp, base_hot_temp - 5),
+            (temperature_message.less_hot.format(-1), base_hot_temp, base_hot_temp + 1),
+            (temperature_message.similarly_hot, base_hot_temp, base_hot_temp),
+            (
+                temperature_message.less_cold.format(1),
+                base_cold_temp,
+                base_cold_temp - 1,
+            ),
+            (temperature_message.colder.format(-1), base_cold_temp, base_cold_temp + 1),
+            (temperature_message.similarly_cold, base_cold_temp, base_cold_temp),
         ],
     )
     @patch("app.utils.weather.Weather.get_weather_data")
