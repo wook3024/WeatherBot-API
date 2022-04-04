@@ -64,6 +64,8 @@ iniconfig==1.1.1
     # via pytest
 omegaconf==2.1.1
     # via hydra-core
+orjson==3.6.7
+    # via -r requirements/dev.in
 packaging==21.3
     # via pytest
 pluggy==1.0.0
