@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 from httpx import AsyncClient
 
-from .. import cfg, schemas, logger
+from .. import cfg, logger, schemas
 
 
 class Weather(object):
@@ -51,11 +51,12 @@ class Weather(object):
 
         data_list = []
         for weather in results:
+            weather = schemas.HistoricalWeatherResponse(**weather)
             data = None
             if key == "temp":
-                data = weather.get("temp")
+                data = weather.temp
             elif key == "weather":
-                code = weather.get("code")
+                code = weather.code
                 data = cfg.service.weather.weather_map[code]
             data_list.append(data)
         return data_list
