@@ -1,4 +1,5 @@
-from unittest.mock import patch
+from typing import List
+from unittest import mock
 
 import pytest
 
@@ -38,10 +39,10 @@ class TestHeadsUp:
             ),
         ],
     )
-    @patch("app.utils.weather.Weather.get_weather_data")
+    @mock.patch("app.utils.weather.Weather.get_weather_data")
     @pytest.mark.asyncio
     async def test_get_headsup(
-        self, mock_get_weather_data, message, pre_weathers
+        self, mock_get_weather_data: mock.AsyncMock, message: str, pre_weathers: List
     ) -> None:
         mock_get_weather_data.return_value = pre_weathers
         return_value = await HeadsUp.get_headsup_message(lat=LAT, lon=LON)

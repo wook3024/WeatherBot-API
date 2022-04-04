@@ -1,5 +1,5 @@
 import asyncio
-from typing import List
+from typing import Dict, List
 from urllib.parse import urljoin
 
 from httpx import AsyncClient
@@ -16,7 +16,7 @@ class Weather(object):
         hour_unit: int = 0,
         unit_count: int = 0,
         endpoint: str = cfg.service.weather.historical_endpoint,
-    ):
+    ) -> Dict:
         response = await client.get(
             url=urljoin(
                 base=cfg.service.weather.base_url,
@@ -41,7 +41,7 @@ class Weather(object):
         hour_unit: int,
         hour_offset: int,
         key: str,
-    ):
+    ) -> List:
         requests = []
         async with AsyncClient() as client:
             while abs(hour_unit * unit_count) <= abs(hour_offset):
