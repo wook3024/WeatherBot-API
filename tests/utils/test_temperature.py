@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest import mock
 
 import pytest
 
@@ -52,11 +52,11 @@ class TestTemperature:
             ),
         ],
     )
-    @patch("app.utils.weather.Weather.get_weather_data")
+    @mock.patch("app.utils.weather.Weather.get_weather_data")
     @pytest.mark.asyncio
     async def test_get_temp_message(
         self,
-        mock_get_weather_data,
+        mock_get_weather_data: mock.AsyncMock,
         diff_temp_message: str,
         cur_temp: float,
         pre_temp: float,
