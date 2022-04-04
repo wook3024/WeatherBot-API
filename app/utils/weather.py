@@ -9,11 +9,18 @@ from .. import cfg, schemas
 
 class Weather(object):
     @staticmethod
-    async def request(client, lat, lon, hour_unit, unit_count):
+    async def request(
+        client: AsyncClient,
+        lat: float,
+        lon: float,
+        hour_unit: int = 0,
+        unit_count: int = 0,
+        endpoint: str = cfg.service.weather.historical_endpoint,
+    ):
         response = await client.get(
             url=urljoin(
                 base=cfg.service.weather.base_url,
-                url=cfg.service.weather.historical_endpoint,
+                url=endpoint,
             ),
             params={
                 "api_key": cfg.service.weather.api_key,

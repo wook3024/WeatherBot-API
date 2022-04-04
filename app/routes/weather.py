@@ -1,6 +1,4 @@
 import asyncio
-from typing import Dict, Optional
-from urllib.parse import urljoin
 
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
@@ -8,50 +6,28 @@ from fastapi.responses import ORJSONResponse
 from httpx import AsyncClient
 
 from .. import cfg, schemas
-from ..utils.weather import Greeting, HeadsUp, Temperature
+from ..utils.weather import Greeting, HeadsUp, Temperature, Weather
 
 router = APIRouter()
-
-
-async def request_weather_data(
-    client: AsyncClient,
-    lon: float,
-    lat: float,
-    endpoint: str,
-    hour_offset: Optional[int] = None,
-) -> Dict:
-    response = await client.get(
-        url=urljoin(
-            base=cfg.service.weather.base_url,
-            url=endpoint,
-        ),
-        params={
-            "api_key": cfg.service.weather.api_key,
-            "lat": lat,
-            "lon": lon,
-            "hour_offset": hour_offset,
-        },
-    )
-    weather = response.json()
-    return weather
 
 
 @router.get("/summary", response_model=schemas.SummaryResponse)
 async def summary(lon: float, lat: float) -> ORJSONResponse:
     async with AsyncClient() as client:
         cur_weather, pre_weather = await asyncio.gather(
-            request_weather_data(
+            Weather.request(
                 client=client,
                 lon=lon,
                 lat=lat,
                 endpoint=cfg.service.weather.current_endpoint,
             ),
-            request_weather_data(
+            Weather.request(
                 client=client,
                 lon=lon,
                 lat=lat,
+                hour_unit=-6,
+                unit_count=4,
                 endpoint=cfg.service.weather.historical_endpoint,
-                hour_offset=-24,
             ),
         )
     greeting_message, temp_message, headsup_message = await asyncio.gather(
