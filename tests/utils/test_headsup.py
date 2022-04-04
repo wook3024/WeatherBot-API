@@ -33,7 +33,7 @@ class TestHeadsUp:
                 ["sun", "rain", "sun", "sun", "foggy", "sun", "sun", "rain"],
             ),
             (
-                headsup_message.clear,
+                headsup_message.so_clear,
                 ["sun", "sun", "sun", "sun", "foggy", "sun", "sun", "rain"],
             ),
         ],

@@ -22,7 +22,7 @@ class TestGreeting:
             (greeting_message.foggy, 1, base_rainfall - 1, base_warm_temp - 1),
             (greeting_message.sunny, 0, base_rainfall - 1, base_warm_temp),
             (greeting_message.cold, 4, base_rainfall - 1, 0),
-            (greeting_message.clear, 4, base_rainfall - 1, base_warm_temp - 1),
+            (greeting_message.so_clear, 4, base_rainfall - 1, base_warm_temp - 1),
         ],
     )
     @pytest.mark.asyncio

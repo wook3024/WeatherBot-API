@@ -1,7 +1,6 @@
 import asyncio
 import time
 
-import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -54,14 +53,4 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     return ORJSONResponse(
         status_code=HTTP_400_BAD_REQUEST,
         content=jsonable_encoder({"detail": exc.errors()}),
-    )
-
-
-if __name__ == "__main__":
-    uvicorn.run(
-        app="main:app",
-        host=cfg.service.app.host,
-        port=cfg.service.app.port,
-        reload=cfg.service.app.reload,
-        log_level=cfg.log.log_level,
     )
