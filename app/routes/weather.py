@@ -8,11 +8,9 @@ from fastapi.responses import ORJSONResponse
 from httpx import AsyncClient
 
 from .. import cfg, schemas
-from ..utils.weather import get_greeting_wording, get_headsup_wording, get_temp_wording
+from ..utils.weather import Greeting, HeadsUp, Temperature
 
 router = APIRouter()
-
-from time import time
 
 
 async def request_weather_data(
@@ -57,15 +55,15 @@ async def summary(lon: float, lat: float) -> ORJSONResponse:
             ),
         )
     greeting_wording, temp_wording, headsup_wording = await asyncio.gather(
-        get_greeting_wording(schemas.CurrentWeatherResponse(**cur_weather)),
-        get_temp_wording(
+        Greeting.get_greeting_wording(schemas.CurrentWeatherResponse(**cur_weather)),
+        Temperature.get_temp_wording(
             lat=lat,
             lon=lon,
             cur_temp=cur_weather.get("temp", float("inf")),
             pre_temp=pre_weather.get("temp", float("inf")),
             hour_offset=-24,
         ),
-        get_headsup_wording(lat, lon),
+        HeadsUp.get_headsup_wording(lat, lon),
     )
     return ORJSONResponse(
         content=jsonable_encoder(

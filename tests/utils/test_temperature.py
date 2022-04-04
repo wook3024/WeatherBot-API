@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from app.utils.weather import get_temp_wording
+from app.utils.weather import Temperature
 
 LAT = 14.3
 LOT = -175
@@ -22,7 +22,7 @@ class TestTemperature:
             ("어제와 비슷하게 춥습니다.", -2, -2),
         ],
     )
-    @patch("app.utils.weather.get_weather_data")
+    @patch("app.utils.weather.Weather.get_weather_data")
     @pytest.mark.asyncio
     async def test_get_temp_wording(
         self,
@@ -33,7 +33,7 @@ class TestTemperature:
     ) -> None:
         temps = [cur_temp, -cur_temp, pre_temp, -pre_temp]
         mock_get_weather_data.return_value = temps
-        return_value = await get_temp_wording(LAT, LOT, cur_temp, pre_temp)
+        return_value = await Temperature.get_temp_wording(LAT, LOT, cur_temp, pre_temp)
         print(temps)
         min_max_temp_wording = "최고기온은 {}도, 최저기온은 {}도 입니다.".format(
             min(temps), max(temps)

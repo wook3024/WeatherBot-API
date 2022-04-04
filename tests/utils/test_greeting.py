@@ -3,7 +3,7 @@ from typing import Optional
 import pytest
 
 from app import schemas
-from app.utils.weather import get_greeting_wording
+from app.utils.weather import Greeting
 
 LAT = 14.3
 LOT = -175
@@ -32,7 +32,7 @@ class TestGreeting:
         rain1h: int,
         temp: float,
     ) -> None:
-        return_value = await get_greeting_wording(
+        return_value = await Greeting.get_greeting_wording(
             schemas.CurrentWeatherResponse(
                 timestamp=0000000000,
                 code=code,
