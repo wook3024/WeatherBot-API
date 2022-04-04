@@ -1,25 +1,31 @@
+import asyncio
 from typing import Dict, Optional
 from urllib.parse import urljoin
 
-import httpx
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from httpx import AsyncClient
 
 from .. import cfg, schemas
 from ..utils.weather import get_greeting_wording, get_headsup_wording, get_temp_wording
 
 router = APIRouter()
 
+from time import time
 
-def request_weather_data(
+
+async def request_weather_data(
+    client: AsyncClient,
     lon: float,
     lat: float,
+    endpoint: str,
     hour_offset: Optional[int] = None,
 ) -> Dict:
-    response = httpx.get(
+    response = await client.get(
         url=urljoin(
-            base=cfg.service.weather.base_url, url=cfg.service.weather.current_endpoint
+            base=cfg.service.weather.base_url,
+            url=endpoint,
         ),
         params={
             "api_key": cfg.service.weather.api_key,
@@ -34,20 +40,33 @@ def request_weather_data(
 
 @router.get("/summary", response_model=schemas.SummaryResponse)
 async def summary(lon: float, lat: float) -> JSONResponse:
-    cur_weather = request_weather_data(lon=lon, lat=lat)
-    pre_weather = request_weather_data(lon=lon, lat=lat, hour_offset=-24)
-
-    greeting_wording = get_greeting_wording(
-        schemas.CurrentWeatherResponse(**cur_weather)
+    async with AsyncClient() as client:
+        cur_weather, pre_weather = await asyncio.gather(
+            request_weather_data(
+                client=client,
+                lon=lon,
+                lat=lat,
+                endpoint=cfg.service.weather.current_endpoint,
+            ),
+            request_weather_data(
+                client=client,
+                lon=lon,
+                lat=lat,
+                endpoint=cfg.service.weather.historical_endpoint,
+                hour_offset=-24,
+            ),
+        )
+    greeting_wording, temp_wording, headsup_wording = await asyncio.gather(
+        get_greeting_wording(schemas.CurrentWeatherResponse(**cur_weather)),
+        get_temp_wording(
+            lat=lat,
+            lon=lon,
+            cur_temp=cur_weather.get("temp", float("inf")),
+            pre_temp=pre_weather.get("temp", float("inf")),
+            hour_offset=-24,
+        ),
+        get_headsup_wording(lat, lon),
     )
-    temp_wording = get_temp_wording(
-        lat=lat,
-        lon=lon,
-        cur_temp=cur_weather.get("temp", float("inf")),
-        pre_temp=pre_weather.get("temp", float("inf")),
-        hour_offset=-24,
-    )
-    headsup_wording = get_headsup_wording(lat, lon)
     return JSONResponse(
         content=jsonable_encoder(
             {
