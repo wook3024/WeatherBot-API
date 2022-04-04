@@ -14,8 +14,21 @@ class TestIndex:
             (1.3, 200),
         ],
     )
-    def test_timeout(
+    def test_request_timeout(
         self, client: TestClient, sleep_time: float, status_code: int
     ) -> None:
         response = client.get("/timeout", params={"sleep_time": sleep_time})
+        assert response.status_code == status_code
+
+    @pytest.mark.parametrize(
+        "lat,lon,status_code",
+        [
+            (2.5, 5.5, 200),
+            (None, 200, 400),
+        ],
+    )
+    def test_bad_request(
+        self, client: TestClient, lat: float, lon: float, status_code: int
+    ) -> None:
+        response = client.get("/summary", params={"lon": lon, "lat": lat})
         assert response.status_code == status_code
