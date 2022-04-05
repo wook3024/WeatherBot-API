@@ -2,12 +2,15 @@ version: '3.8'
 
 services:
   web:
-    image: suy3024/fastapi-template:${WEATHER_IMAGE_VERSION:-0.1.0}
+    image: suy3024/weatherbot-api:${WEATHER_IMAGE_VERSION:-0.1.0}
     build:
       context: .
       dockerfile: Dockerfile
       args:
         PYTHON_VERSION: ${PYTHON_VERSION:-3.8}
+    deploy:
+      restart_policy:
+        condition: on-failure
     container_name: web
     ports:
       - 8000:8000
