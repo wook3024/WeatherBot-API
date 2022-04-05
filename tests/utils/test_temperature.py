@@ -61,7 +61,7 @@ class TestTemperature:
         cur_temp: float,
         pre_temp: float,
     ) -> None:
-        temps = [cur_temp, -cur_temp, pre_temp, -pre_temp]
+        temps = [cur_temp, -cur_temp, pre_temp, -pre_temp, cur_temp + pre_temp]
         mock_get_weather_data.return_value = temps
         return_value = await Temperature.get_temp_message(LAT, LOT, cur_temp, pre_temp)
         min_max_temp_message = temperature_message.min_max.format(
