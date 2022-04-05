@@ -1,4 +1,5 @@
 import asyncio
+from functools import lru_cache
 from typing import Dict, List
 from urllib.parse import urljoin
 
@@ -45,7 +46,19 @@ class Weather(object):
         requests = []
         async with AsyncClient() as client:
             while abs(hour_unit * unit_count) <= abs(hour_offset):
-                requests.append(cls.request(client, lat, lon, hour_unit, unit_count))
+                endpoint = cfg.service.weather.historical_endpoint
+                if unit_count == 0:
+                    endpoint = cfg.service.weather.current_endpoint
+                requests.append(
+                    cls.request(
+                        client=client,
+                        lat=lat,
+                        lon=lon,
+                        hour_unit=hour_unit,
+                        unit_count=unit_count,
+                        endpoint=endpoint,
+                    )
+                )
                 unit_count += 1
             results = await asyncio.gather(*requests)
 
@@ -66,9 +79,10 @@ class Greeting(object):
     @staticmethod
     async def get_greeting_message(cur_weather: schemas.CurrentWeatherResponse) -> str:
         message = ""
-        weather = cfg.service.weather.weather_map[cur_weather.code]
-        base_rainfall = cfg.service.weather.base_rainfall
-        base_warm_temp = cfg.service.weather.base_warm_temp
+        weather_config = cfg.service.weather
+        weather = weather_config.weather_map[cur_weather.code]
+        base_rainfall = weather_config.base_rainfall
+        base_warm_temp = weather_config.base_warm_temp
         greeting_message = cfg.service.message.greeting
         if weather == "snow":
             message = greeting_message.snow
@@ -94,7 +108,7 @@ class Temperature(object):
     @staticmethod
     async def get_min_max_temp_message(lat: float, lon: float, hour_offset: int) -> str:
         historical_time_unit = cfg.service.weather.historical_time_unit
-        unit_count = 1
+        unit_count = 0
         temps = await Weather.get_weather_data(
             lat=lat,
             lon=lon,
