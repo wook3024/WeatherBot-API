@@ -12,12 +12,12 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH /workspace
 
 COPY . /workspace
+
 WORKDIR /workspace
+RUN pip install --upgrade pip
 
-RUN pip install --upgrade pip && \
-    pip install pip-tools
-
-RUN pip-sync requirements/dev.txt
+RUN pip install pip-tools && \
+    pip-sync requirements/dev.txt
 
 USER appuser
 
